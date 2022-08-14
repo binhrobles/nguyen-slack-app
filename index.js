@@ -12,9 +12,11 @@ const app = new Bolt.App({
 	token: SLACK_BOT_TOKEN,
 });
 
-// AWS Translate configuration
+// Translation configuration
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-translate/index.html
 import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
+import cld from 'cld';
+
 const translateClient = new TranslateClient({ region: 'us-west-2' });
 
 // App logic
@@ -25,13 +27,29 @@ app.message(async ({ message }) => {
 	try {
 		// only want to do translations on parent messages
 		if (isParent(message)) {
-			console.log('heard parent');
+			console.log(`heard parent: ${message.text}`);
 
-			// TODO: need to detect english vs viet
+			// detect english vs viet
+			
+			// if message text is less than 20, CLD will have issues
+			// https://github.com/dachev/node-cld/issues/33
+			let detectionInput = message.text;
+			if (detectionInput > 0 && detectionInput.length < 20) {
+				// so we're just not gonna
+				return;
+			}
+
+			const recognition = await cld.detect(detectionInput);
+
+			// pull the first (or most confident) language
+			const detectedLangCode = recognition.languages[0].code;
+
+			// target language is vietnamese, unless the message is in viet
+			const targetLangCode = detectedLangCode === 'en' ? 'vi' : 'en';
 
 			const translation = await translateClient.send(new TranslateTextCommand({
-				SourceLanguageCode: 'en',
-				TargetLanguageCode: 'vi',
+				SourceLanguageCode: detectedLangCode,
+				TargetLanguageCode: targetLangCode,
 				Text: message.text,
 			}));
 
