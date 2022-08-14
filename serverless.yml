@@ -2,12 +2,21 @@
 service: serverless-bolt-js
 frameworkVersion: '3'
 useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs14.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'translate:*'
+          Resource: '*'
+
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+
 functions:
   slack:
     handler: index.handler
@@ -15,5 +24,6 @@ functions:
       - http:
           path: slack/events
           method: post
+
 plugins:
   - serverless-offline
