@@ -7,9 +7,13 @@ import Bolt from '@slack/bolt';
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 
+const receiver = new Bolt.AwsLambdaReceiver({
+    signingSecret: SLACK_SIGNING_SECRET,
+});
+
 const app = new Bolt.App({
-	signingSecret: SLACK_SIGNING_SECRET,
 	token: SLACK_BOT_TOKEN,
+	receiver,
 });
 
 // Translation configuration
@@ -64,9 +68,7 @@ app.message(async ({ message }) => {
 	}
 });
 
-(async () => {
-	// Start the app
-	await app.start(process.env.PORT || 3000);
-
-	console.log('⚡️ Bolt app is running!');
-})();
+export const handler = async (event, context, callback) => {
+    const handler = await receiver.start();
+    return handler(event, context, callback);
+}
