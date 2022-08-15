@@ -18,7 +18,6 @@ export const configureSlackApp = () => {
 	return { app, receiver };
 };
 
-
 // determines whether the Slack message is a top-level, parent 
 // message by comparing the thread timestamp and the timestamp of
 // the message itself.
