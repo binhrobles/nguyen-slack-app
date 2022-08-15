@@ -38,7 +38,7 @@ app.message(async ({ message }) => {
 			return;
 		}
 
-		const { detected, target } = detectLanguage(message.text);
+		const { detected, target } = await detectLanguage(message.text);
 
 		const translation = await translateClient.send(new TranslateTextCommand({
 			SourceLanguageCode: detected,
