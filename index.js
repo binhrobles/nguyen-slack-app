@@ -1,28 +1,13 @@
 import 'dotenv/config';
 
-// Slack configuration
-// https://slack.dev/bolt-js/reference
-import Bolt from '@slack/bolt';
+import SlackUtils from './utils/slack.js';
+import TranslationUtils from './utils/translation.js';
 
-const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
-const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
-
-const receiver = new Bolt.AwsLambdaReceiver({
-    signingSecret: SLACK_SIGNING_SECRET,
-});
-
-const app = new Bolt.App({
-	token: SLACK_BOT_TOKEN,
-	receiver,
-});
-
-// App logic
-
-import { isParent, respondInThread, detectLanguage, createTranslationMessage, translate } from './utils.js';
+const { app, receiver } = SlackUtils.configureSlackApp();
 
 app.message(async ({ message }) => {
 	// only want to do translations on parent messages
-	if (isParent(message)) {
+	if (SlackUtils.isParentMessage(message)) {
 		console.log(`heard parent: ${message.text}`);
 
 		// if message text is less than ~20 chars, CLD will have issues
@@ -32,21 +17,21 @@ app.message(async ({ message }) => {
 			return;
 		}
 
-		const { detected, target } = await detectLanguage(message.text);
+		const { detected, target } = await TranslationUtils.detectLanguage(message.text);
 		console.log(`detected: ${detected} target: ${target}`);
 
-		const translation = await translate({ 
+		const translation = await TranslationUtils.translate({ 
 			source: detected, 
 			target, 
 			text: message.text 
 		});
 		console.log(`translation: ${translation}`);
 
-		await respondInThread({
+		await SlackUtils.respondInThread({
 			app,
 			messageObj: message,
 			text: translation,
-			blocks: createTranslationMessage({
+			blocks: TranslationUtils.createTranslationMessage({
 				detected, 
 				target, 
 				original: message.text,
@@ -57,10 +42,6 @@ app.message(async ({ message }) => {
 });
 
 app.action('translate-click', async ({ ack }) => ack);
-
-app.error((error) => {
-  console.error(error);
-});
 
 export const handler = async (event, context, callback) => {
     const handler = await receiver.start();
