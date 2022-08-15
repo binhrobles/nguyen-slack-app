@@ -10,7 +10,12 @@
     "dotenv": "^16.0.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.19",
     "serverless-offline": "^9.2.0"
-  }
+  },
+  "name": "viet-slackbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/binhrobles/nguyen-slack-app.git",
+  "author": "Binh 🌱 <binhrobles@gmail.com>",
+  "license": "MIT"
 }

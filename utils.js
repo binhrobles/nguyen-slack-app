@@ -38,9 +38,11 @@ export const detectLanguage = async (text) => {
 
 	const recognition = await cld.detect(text);
 
+	// pull the first (or most confident) language
+	const detectedLangCode = recognition.languages[0].code;
+
 	return {
-		// pull the first (or most confident) language
-		detected: recognition.languages[0].code,
+		detected: detectedLangCode,
 
 		// target language is vietnamese, unless the message is in viet
 		target: detectedLangCode === 'en' ? 'vi' : 'en',
