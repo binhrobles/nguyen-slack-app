@@ -21,7 +21,7 @@ export const createTranslationMessage = (detected, target, text) => ({
 	type: "section",
 	text: {
 		type: "plain_text",
-		text: `:ba: ${translation.TranslatedText}`,
+		text: `:ba: ${text}`,
 	},
 	accessory: {
 		type: "button",
