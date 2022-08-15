@@ -30,12 +30,12 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
-      - run: yarn install --frozen-lockfile --production
+      - run: yarn install --frozen-lockfile
 
       - name: serverless deploy
         uses: serverless/github-action@v3.1
         with:
-          args: deploy --stage production --verbose
+          args: deploy --verbose
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
