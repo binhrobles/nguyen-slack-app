@@ -17,21 +17,22 @@ export const respondInThread = async ({ app, messageObj, text, blocks = [] }) =>
 export const createGoogleTranslateLink = (detected, target, text) =>
 	`https://translate.google.com/?sl=${detected}&tl=${target}&text=${encodeURIComponent(text)}&op=translate`;
 
-export const createTranslationMessage = (detected, target, text) => ({
+export const createTranslationMessage = ({ detected, target, original, translated }) => ([{
 	type: "section",
 	text: {
 		type: "plain_text",
-		text: `:ba: ${text}`,
+		text: `:ba: ${translated}`,
 	},
 	accessory: {
+		action_id: 'translate-click',
 		type: "button",
 		text: {
 			type: "plain_text",
-			text: "Open Google Translate"
+			text: ":translate-icon:"
 		},
-		url: createGoogleTranslateLink(detected, target, text),
+		url: createGoogleTranslateLink(detected, target, original),
 	}
-});
+}]);
 
 import cld from 'cld';
 export const detectLanguage = async (text) => {

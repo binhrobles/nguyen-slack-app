@@ -40,19 +40,34 @@ app.message(async ({ message }) => {
 
 		const { detected, target } = await detectLanguage(message.text);
 
+		console.log(`detected: ${detected} target: ${target}`);
+
 		const translation = await translateClient.send(new TranslateTextCommand({
 			SourceLanguageCode: detected,
 			TargetLanguageCode: target,
 			Text: message.text,
 		}));
 
+		console.log(`translation: ${translation.TranslatedText}`);
+
 		await respondInThread({
 			app,
 			messageObj: message,
 			text: translation.TranslatedText,
-			blocks: createTranslationMessage(detected, target, translation.TranslatedText),
+			blocks: createTranslationMessage({
+				detected, 
+				target, 
+				original: message.text,
+				translated: translation.TranslatedText
+			}),
 		});
 	}
+});
+
+app.action('translate-click', async ({ ack }) => ack);
+
+app.error((error) => {
+  console.error(error);
 });
 
 export const handler = async (event, context, callback) => {
