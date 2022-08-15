@@ -30,7 +30,7 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --production
 
       - name: serverless deploy
         uses: serverless/github-action@v3.1
