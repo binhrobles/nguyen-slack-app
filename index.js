@@ -27,35 +27,31 @@ const translateClient = new TranslateClient({ region: 'us-west-2' });
 import { isParent, respondInThread, detectLanguage, createTranslationMessage } from './utils.js';
 
 app.message(async ({ message }) => {
-	try {
-		// only want to do translations on parent messages
-		if (isParent(message)) {
-			console.log(`heard parent: ${message.text}`);
+	// only want to do translations on parent messages
+	if (isParent(message)) {
+		console.log(`heard parent: ${message.text}`);
 
-			// if message text is less than ~20 chars, CLD will have issues
-			// https://github.com/dachev/node-cld/issues/33
-			if (message.text > 0 && message.text.length < 20) {
-				// so we're just not gonna
-				return;
-			}
-
-			const { detected, target } = detectLanguage(message.text);
-
-			const translation = await translateClient.send(new TranslateTextCommand({
-				SourceLanguageCode: detected,
-				TargetLanguageCode: target,
-				Text: message.text,
-			}));
-
-			await respondInThread({
-				app,
-				messageObj: message,
-				text: translation.TranslatedText,
-				blocks: createTranslationMessage(detected, target, translation.TranslatedText),
-			});
+		// if message text is less than ~20 chars, CLD will have issues
+		// https://github.com/dachev/node-cld/issues/33
+		if (message.text > 0 && message.text.length < 20) {
+			// so we're just not gonna
+			return;
 		}
-	} catch (e) {
-		console.error(e);
+
+		const { detected, target } = detectLanguage(message.text);
+
+		const translation = await translateClient.send(new TranslateTextCommand({
+			SourceLanguageCode: detected,
+			TargetLanguageCode: target,
+			Text: message.text,
+		}));
+
+		await respondInThread({
+			app,
+			messageObj: message,
+			text: translation.TranslatedText,
+			blocks: createTranslationMessage(detected, target, translation.TranslatedText),
+		});
 	}
 });
 
