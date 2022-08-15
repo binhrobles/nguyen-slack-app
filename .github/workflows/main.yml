@@ -25,10 +25,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Serverless
-        uses: serverless/github-action
-
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: 'yarn'
+
+      - name: serverless deploy
+        uses: serverless/github-action@v3.1
+        with:
+          args: deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
