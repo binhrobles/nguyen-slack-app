@@ -13,3 +13,16 @@ export const respondInThread = async ({ app, message, text }) => {
 	});
 }
 
+import cld from 'cld';
+export const detectLanguage = async (text) => {
+
+	const recognition = await cld.detect(text);
+
+	return {
+		// pull the first (or most confident) language
+		detected: recognition.languages[0].code,
+
+		// target language is vietnamese, unless the message is in viet
+		target: detectedLangCode === 'en' ? 'vi' : 'en',
+	};
+};
