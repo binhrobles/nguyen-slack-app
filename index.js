@@ -24,7 +24,7 @@ const translateClient = new TranslateClient({ region: 'us-west-2' });
 
 // App logic
 
-import { isParent, respondInThread } from './utils.js';
+import { isParent, respondInThread, createTranslationMessage } from './utils.js';
 
 app.message(async ({ message }) => {
 	try {
@@ -49,8 +49,9 @@ app.message(async ({ message }) => {
 
 			await respondInThread({
 				app,
-				message,
-				text: `:ba: ${translation.TranslatedText}`,
+				messageObj: message,
+				text: translation.TranslatedText,
+				blocks: createTranslationMessage(detected, target, translation.TranslatedText),
 			});
 		}
 	} catch (e) {
