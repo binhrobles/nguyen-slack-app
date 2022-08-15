@@ -12,12 +12,15 @@ app.message(async ({ message }) => {
 
 		// if message text is less than ~20 chars, CLD will have issues
 		// https://github.com/dachev/node-cld/issues/33
-		if (message.text > 0 && message.text.length < 20) {
+		if (message.text.length < 20) {
 			// so we're just not gonna
+			console.warn('message too short! Exiting.');
 			return;
 		}
 
-		const { detected, target } = await TranslationUtils.detectLanguage(message.text);
+		const detected = await TranslationUtils.detectLanguage(message.text);
+		// target language is vietnamese, unless the message is in viet
+		const target = detected === 'en' ? 'vi' : 'en';
 		console.log(`detected: ${detected} target: ${target}`);
 
 		const translation = await TranslationUtils.translate({ 
@@ -31,7 +34,7 @@ app.message(async ({ message }) => {
 			app,
 			messageObj: message,
 			text: translation,
-			blocks: TranslationUtils.createTranslationMessage({
+			blocks: SlackUtils.createTranslationMessage({
 				detected, 
 				target, 
 				original: message.text,

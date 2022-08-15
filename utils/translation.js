@@ -7,38 +7,14 @@ const translationClient = axios.create({
   baseURL: 'https://translation.googleapis.com/language/translate/v2',
 });
 
-export const createGoogleTranslateLink = (detected, target, text) =>
-	`https://translate.google.com/?sl=${detected}&tl=${target}&text=${encodeURIComponent(text)}&op=translate`;
-
-export const createTranslationMessage = ({ detected, target, original, translation }) => ([{
-	type: "section",
-	text: {
-		type: "plain_text",
-		text: `:ba: ${translation}`,
-	},
-	accessory: {
-		action_id: 'translate-click',
-		type: "button",
-		text: {
-			type: "plain_text",
-			text: ":translate-icon:"
-		},
-		url: createGoogleTranslateLink(detected, target, original),
-	}
-}]);
+export const createGoogleTranslateLink = (source, target, text) =>
+	`https://translate.google.com/?sl=${source}&tl=${target}&text=${encodeURIComponent(text)}&op=translate`;
 
 export const detectLanguage = async (text) => {
 	const recognition = await cld.detect(text);
 
 	// pull the first (or most confident) language
-	const detectedLangCode = recognition.languages[0].code;
-
-	return {
-		detected: detectedLangCode,
-
-		// target language is vietnamese, unless the message is in viet
-		target: detectedLangCode === 'en' ? 'vi' : 'en',
-	};
+	return recognition.languages[0].code;
 };
 
 // https://cloud.google.com/translate/docs/reference/rest/v2/translate
@@ -52,7 +28,6 @@ export const translate = async ({ source, target, text }) => {
 
 export default {
 	createGoogleTranslateLink,
-	createTranslationMessage,
 	detectLanguage,
 	translate,
 };
