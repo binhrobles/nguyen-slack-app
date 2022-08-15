@@ -52,16 +52,18 @@ export const detectLanguage = async (text) => {
 
 
 // Translation configuration
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-translate/index.html
-import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
-const translateClient = new TranslateClient({ region: 'us-west-2' });
+// https://cloud.google.com/translate/docs/reference/rest/v2/translate
+import axios from 'axios';
+const TRANSLATE_API_KEY = process.env.TRANSLATE_API_KEY;
+
+const translationClient = axios.create({
+  baseURL: 'https://translation.googleapis.com/language/translate/v2',
+});
 
 export const translate = async ({ source, target, text }) => {
-	const translation = await translateClient.send(new TranslateTextCommand({
-		SourceLanguageCode: source,
-		TargetLanguageCode: target,
-		Text: text,
-	}));
+	const response = await translationClient.get(
+      `?key=${TRANSLATE_API_KEY}&source=${source}&target=${target}&q=${encodeURIComponent(text)}`
+    );
 
-	return translation.TranslatedText;
+	return response.data.data.translations[0].translatedText;
 }

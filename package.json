@@ -4,7 +4,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-translate": "^3.145.0",
     "@slack/bolt": "^3.12.1",
     "cld": "^2.8.4",
     "dotenv": "^16.0.1"
