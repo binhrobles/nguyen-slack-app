@@ -16,15 +16,9 @@ const app = new Bolt.App({
 	receiver,
 });
 
-// Translation configuration
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-translate/index.html
-import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
-
-const translateClient = new TranslateClient({ region: 'us-west-2' });
-
 // App logic
 
-import { isParent, respondInThread, detectLanguage, createTranslationMessage } from './utils.js';
+import { isParent, respondInThread, detectLanguage, createTranslationMessage, translate } from './utils.js';
 
 app.message(async ({ message }) => {
 	// only want to do translations on parent messages
@@ -39,26 +33,24 @@ app.message(async ({ message }) => {
 		}
 
 		const { detected, target } = await detectLanguage(message.text);
-
 		console.log(`detected: ${detected} target: ${target}`);
 
-		const translation = await translateClient.send(new TranslateTextCommand({
-			SourceLanguageCode: detected,
-			TargetLanguageCode: target,
-			Text: message.text,
-		}));
-
-		console.log(`translation: ${translation.TranslatedText}`);
+		const translation = await translate({ 
+			source: detected, 
+			target, 
+			text: message.text 
+		});
+		console.log(`translation: ${translation}`);
 
 		await respondInThread({
 			app,
 			messageObj: message,
-			text: translation.TranslatedText,
+			text: translation,
 			blocks: createTranslationMessage({
 				detected, 
 				target, 
 				original: message.text,
-				translated: translation.TranslatedText
+				translation,
 			}),
 		});
 	}

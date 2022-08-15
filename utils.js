@@ -17,11 +17,11 @@ export const respondInThread = async ({ app, messageObj, text, blocks = [] }) =>
 export const createGoogleTranslateLink = (detected, target, text) =>
 	`https://translate.google.com/?sl=${detected}&tl=${target}&text=${encodeURIComponent(text)}&op=translate`;
 
-export const createTranslationMessage = ({ detected, target, original, translated }) => ([{
+export const createTranslationMessage = ({ detected, target, original, translation }) => ([{
 	type: "section",
 	text: {
 		type: "plain_text",
-		text: `:ba: ${translated}`,
+		text: `:ba: ${translation}`,
 	},
 	accessory: {
 		action_id: 'translate-click',
@@ -49,3 +49,19 @@ export const detectLanguage = async (text) => {
 		target: detectedLangCode === 'en' ? 'vi' : 'en',
 	};
 };
+
+
+// Translation configuration
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-translate/index.html
+import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
+const translateClient = new TranslateClient({ region: 'us-west-2' });
+
+export const translate = async ({ source, target, text }) => {
+	const translation = await translateClient.send(new TranslateTextCommand({
+		SourceLanguageCode: source,
+		TargetLanguageCode: target,
+		Text: text,
+	}));
+
+	return translation.TranslatedText;
+}
