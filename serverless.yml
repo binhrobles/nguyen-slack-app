@@ -6,16 +6,11 @@ useDotenv: true
 provider:
   name: aws
   runtime: nodejs14.x
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action: 'translate:*'
-          Resource: '*'
 
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    TRANSLATE_API_KEY: ${env:TRANSLATE_API_KEY}
 
 functions:
   slack:
