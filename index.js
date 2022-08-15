@@ -24,7 +24,7 @@ const translateClient = new TranslateClient({ region: 'us-west-2' });
 
 // App logic
 
-import { isParent, respondInThread, createTranslationMessage } from './utils.js';
+import { isParent, respondInThread, detectLanguage, createTranslationMessage } from './utils.js';
 
 app.message(async ({ message }) => {
 	try {
@@ -39,7 +39,7 @@ app.message(async ({ message }) => {
 				return;
 			}
 
-			const { detected, target } = utils.detectLanguage(message.text);
+			const { detected, target } = detectLanguage(message.text);
 
 			const translation = await translateClient.send(new TranslateTextCommand({
 				SourceLanguageCode: detected,
